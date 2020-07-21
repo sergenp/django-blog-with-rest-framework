@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from .models import Comment, BlogPost
 
 # User serializer, django provides a User model already, so we are going to use that model
 class UserSerializer(serializers.ModelSerializer):
@@ -22,9 +23,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     # and return that user back for to use in the api.py (look at api.py line 16, when we call the save() method, 
     # it calls this create method inside of it)
     def create(self, validated_data):
-        user = User.objects.create_user(validated_data['username'], 
+        return User.objects.create_user(validated_data['username'], 
         validated_data['email'], validated_data['password'])
-        return user
 
 # Login Serializer
 class LoginSerializer(serializers.Serializer):
@@ -39,4 +39,20 @@ class LoginSerializer(serializers.Serializer):
             return user
         raise serializers.ValidationError("Incorrect Credentials")
 
+# Comment Serializer
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('__all__')
+    
+    def create(self, validated_data):
+        return Comment.objects.create(**validated_data)
 
+# BlogPost Serializer
+class BlogPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlogPost
+        fields = ('__all__')
+
+    def create(self, validated_data):
+        return BlogPost.objects.create(**validated_data)

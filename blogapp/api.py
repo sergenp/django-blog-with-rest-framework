@@ -1,7 +1,8 @@
-from rest_framework import permissions, generics
+from rest_framework import permissions, generics, viewsets, status
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, CommentSerializer, BlogPostSerializer
+from .models import BlogPost, Comment
 
 # Register API
 class RegisterAPI(generics.GenericAPIView):
@@ -36,6 +37,7 @@ class LoginAPI(generics.GenericAPIView):
             "token" : AuthToken.objects.create(user)[1]
         })
 
+# User API
 class UserAPI(generics.RetrieveAPIView):
     permission_classes = [
         permissions.IsAuthenticated
@@ -44,3 +46,36 @@ class UserAPI(generics.RetrieveAPIView):
     # looks at the token sent, and returns the user using that token, notice this is a GET request
     def get_object(self):
         return self.request.user
+
+# Comment API
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+    serializer_class = CommentSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        comment = serializer.save()
+        return Response({
+            "comment" : CommentSerializer(comment, context=self.get_serializer_context()).data,
+        }, status=status.HTTP_201_CREATED)
+
+class BlogPostViewSet(viewsets.ModelViewSet):
+    queryset = BlogPost.objects.all()
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+    serializer_class = BlogPostSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            blogpost = serializer.save()
+            return Response({
+                "post" : BlogPostSerializer(blogpost, context=self.get_serializer_context()).data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
