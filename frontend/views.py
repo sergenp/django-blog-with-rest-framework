@@ -18,3 +18,6 @@ def home(request):
 
 def about(request):
      return render(request, 'about.html', {'title': 'About'})
+
+def login(request):
+    return render(request, 'login.html')
