@@ -1,7 +1,6 @@
 {% load static %}
-
 <head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    {% include "_headers.html" %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
 </head>
 
@@ -21,14 +20,17 @@
                             </div>
                             <div class="form-group">
                                 <label for="password" class="text-info">Password:</label><br>
-                                <input type="text" name="password" id="password" class="form-control">
+                                <input type="password" name="password" id="password" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label for="remember-me" class="text-info"><span>Remember me</span> <span><input id="remember-me" name="remember-me" type="checkbox"></span></label><br>
-                                <input type="submit" name="submit" class="btn btn-info btn-md" value="submit">
-                            </div>
-                            <div id="register-link" class="text-right">
-                                <a href="#" class="text-info">Register here</a>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="submit" name="submit" class="btn btn-info btn-md" value="Login">
+                                    </div>
+                                    <div class="col-md-6 text-right">   
+                                        <a class="btn btn-danger" href="#"> Register </a>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -36,9 +38,6 @@
             </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="{% static 'js/login.js' %}"></script>
+    {% include "_scripts.html" %}
+    <script src="{% static 'js/api/login.js'%}"></script>
 </body>

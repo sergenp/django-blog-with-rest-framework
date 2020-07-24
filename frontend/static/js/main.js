@@ -255,6 +255,12 @@
 
 
 
+if (localStorage.getItem("token") != null) {
+	$("#login-link").remove();
+} else{
+	$("#logout-link").remove();
+}
+
 
 })(jQuery);
 

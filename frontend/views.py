@@ -1,22 +1,12 @@
-from django.shortcuts import render
+from django.http import HttpResponseNotFound
+from django.shortcuts import render, redirect
+from blogapp.models import BlogPost, Comment
 
-posts = [
-    {
-        'author': 'Ryn',
-        'title': 'Dummy Post',
-        'content': 'This is a Dummy Post',
-        'date_posted': '7/15/2020',
-        'category' : "Dummy",
-        "comment_count" : 25
-    }
-]
 
 def index(request):
-    context = {
-            'posts': posts
-        }
-    return render(request, 'index.html', context)
-
+    posts = BlogPost.objects.all().extra(select=
+  {'comment_count': 'SELECT count(*) FROM blogapp_comment WHERE blogapp_comment.post_id=blogapp_blogpost.id'},)
+    return render(request, 'index.html', {"posts" : posts})
 
 def about(request):
      return render(request, 'about.html', {'title': 'About'})
@@ -26,3 +16,9 @@ def contact(request):
 
 def login(request):
     return render(request, 'login.html')
+
+def post(request, id):
+    post = BlogPost.objects.filter(pk=id).first()
+    if post:
+        return render(request, 'single.html',  {"post" : BlogPost.objects.get(pk=id)} )
+    return render(request, '404.html')
