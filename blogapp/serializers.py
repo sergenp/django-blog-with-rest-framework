@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import Comment, BlogPost
+from .models import Comment, BlogPost, Category, Tag
 from markdown import Markdown
 
 MARKDOWN = Markdown()
@@ -56,7 +56,24 @@ class BlogPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
         fields = ('__all__')
+        post_image = serializers.ImageField()
 
     def create(self, validated_data):
         validated_data["content"] = MARKDOWN.convert(validated_data["content"])
         return BlogPost.objects.create(**validated_data)
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('__all__')
+
+    def create(self, validated_data):
+        return Category.objects.create(**validated_data)
+
+class TagsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ('__all__')
+        
+    def create(self, validated_data):
+        return Tag.objects.create(**validated_data)

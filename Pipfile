@@ -11,6 +11,7 @@ djangorestframework = "*"
 django-filter = "*"
 markdown = "*"
 django-rest-knox = "*"
+pillow = "*"
 
 [requires]
 python_version = "3.7"

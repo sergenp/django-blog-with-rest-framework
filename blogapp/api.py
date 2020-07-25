@@ -1,8 +1,8 @@
-from rest_framework import permissions, generics, viewsets, status
+from rest_framework import permissions, generics, viewsets, status, parsers
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, CommentSerializer, BlogPostSerializer
-from .models import BlogPost, Comment
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, CommentSerializer, BlogPostSerializer, CategorySerializer, TagsSerializer
+from .models import BlogPost, Comment, Category, Tag
 
 # Register API
 class RegisterAPI(generics.GenericAPIView):
@@ -69,6 +69,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly
     ]
     serializer_class = BlogPostSerializer
+    parser_class = (parsers.FileUploadParser,)
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -76,6 +77,39 @@ class BlogPostViewSet(viewsets.ModelViewSet):
             blogpost = serializer.save()
             return Response({
                 "post" : BlogPostSerializer(blogpost, context=self.get_serializer_context()).data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CategoriesViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+    serializer_class = CategorySerializer
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            category = serializer.save()
+            return Response({
+                "post" : CategorySerializer(category, context=self.get_serializer_context()).data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TagsViewSet(viewsets.ModelViewSet):
+    query_set = Tag.objects.all()
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+    serializer_class = TagsSerializer 
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            tag = serializer.save()
+            return Response({
+                "post" : TagsSerializer(tag, context=self.get_serializer_context()).data
             }, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
