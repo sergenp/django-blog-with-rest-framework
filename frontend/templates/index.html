@@ -30,7 +30,7 @@
 						{% endif %}
 					</p>
 				</div>
-					<p class="mb-4">{{post.content}}</p>
+					<p class="mb-4">{{post.content | safe |stringformat:".20s" }}</p>
 					<p><a href="post/{{post.id}}" class="btn-custom">Read More <span class="ion-ios-arrow-forward"></span></a></p>
 				</div>
 						</div>
