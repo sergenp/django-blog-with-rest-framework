@@ -1,6 +1,6 @@
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
-from blogapp.models import BlogPost, Comment
+from blogapp.models import BlogPost, Comment, Tag, Category
 
 
 def index(request):
@@ -19,6 +19,8 @@ def login(request):
 
 def post(request, id):
     post = BlogPost.objects.filter(pk=id).first()
+    tags = Tag.objects.all()
+    category = Category.objects.filter(pk=post.category.pk)
     if post:
-        return render(request, 'single.html',  {"post" : BlogPost.objects.get(pk=id)} )
+        return render(request, 'single.html',  {"post" : BlogPost.objects.get(pk=id), "tags" : tags, "category" : category})
     return render(request, '404.html')

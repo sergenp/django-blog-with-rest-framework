@@ -2,9 +2,6 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from .models import Comment, BlogPost, Category, Tag
-from markdown import Markdown
-
-MARKDOWN = Markdown()
 
 # User serializer, django provides a User model already, so we are going to use that model
 class UserSerializer(serializers.ModelSerializer):
@@ -59,7 +56,6 @@ class BlogPostSerializer(serializers.ModelSerializer):
         post_image = serializers.ImageField()
 
     def create(self, validated_data):
-        validated_data["content"] = MARKDOWN.convert(validated_data["content"])
         return BlogPost.objects.create(**validated_data)
 
 class CategorySerializer(serializers.ModelSerializer):

@@ -15,17 +15,23 @@
 	    		<div class="row d-flex no-gutters">
 	    			<div class="col-lg-8 px-md-5 py-5">
 	    				<div class="row">
-	    					<h1 class="mb-3">{{post.title}}</h1>
-								{{ post.content | safe }}		          
+							<h1 class="mb-3">{{post.title}}</h1>
+						</div>
+						<div class="row">
+							<br /><p>&nbsp;</p>
+								{{ post.formatted_markdown | safe }}		          
 					<!-- TAGS -->
-					<div class="tag-widget post-tag-container mb-5 mt-5">
-		              <div class="tagcloud">
-		                <a href="#" class="tag-cloud-link">Life</a>
-		                <a href="#" class="tag-cloud-link">Sport</a>
-		                <a href="#" class="tag-cloud-link">Tech</a>
-		                <a href="#" class="tag-cloud-link">Travel</a>
-		              </div>
-		            </div>
+					<div class="row">
+						<div class="col-md">
+							<div class="tag-widget post-tag-container mb-5 mt-5">
+								<div class="tagcloud">
+								{% for tag in tags%}
+									<a href="#" class="tag-cloud-link">{{ tag.title}}</a>
+								{% endfor %}
+								</div>
+							</div>
+						</div>
+					</div>
 		            <!-- ABOUT AUTHOR -->
 		            <div class="about-author d-flex p-4 bg-light">
 		              <div class="bio mr-5">
