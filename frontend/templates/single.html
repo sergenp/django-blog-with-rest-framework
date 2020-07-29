@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,6 +10,7 @@
 
 <body>
 
+<input hidden id="post-id" value="{{ post.id }}"></body>
 <div id="colorlib-page">
 	<a href="#" class="js-colorlib-nav-toggle colorlib-nav-toggle"><i></i></a>
 	{% include "_aside.html" %}
@@ -58,10 +61,11 @@
 									{% for comment in comments %}
 									<li class="comment">
 										<div class="vcard bio">
-											<img src="images/person_1.jpg" alt="Image placeholder">
+											<p>{{ comment.username }}</p>
+											<img src="https://via.placeholder.com/200x250.png" alt="Image placeholder">
 										</div>
 										<div class="comment-body">
-											<h3>{{ comment.user.username }}</h3>
+											<h3>{{ comment.title }}</h3>
 											<div class="meta">{{ comment.created_date }}</div>
 											<p> {{ comment.body }} </p>
 											<p><a href="#" class="reply">Reply</a></p>
@@ -72,22 +76,26 @@
 								<!-- END comment-list -->
 
 								<div class="comment-form-wrap pt-5">
+									{% csrf_token %}
 									<h3 class="mb-5">Leave a comment</h3>
-									<form action="#" class="p-3 p-md-4 bg-light">
-										<div class="form-group">
+									<form action="#" class="p-3 p-md-4 bg-light" id="post_comment_form">
+										<div class="form-group" id="name-group">
 											<label for="name">Name *</label>
-											<input type="text" class="form-control" id="name">
+											<input type="text" class="form-control" id="name" required>
 										</div>
 										<div class="form-group">
-											<label for="message">Message</label>
+											<label for="title"> Title *</label>
+											<input type="text" class="form-control" id="title" required>
+										</div>
+										<div class="form-group">
+											<label for="message">Message *</label>
 											<textarea name="" id="message" cols="30" rows="10"
-												class="form-control"></textarea>
+												class="form-control" required></textarea>
 										</div>
 										<div class="form-group">
 											<input type="submit" value="Post Comment"
 												class="btn py-3 px-4 btn-primary">
 										</div>
-
 									</form>
 								</div>
 							</div>
@@ -215,6 +223,7 @@
 			<circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10"
 				stroke="#F96D00" /></svg></div>
 	{% include "_scripts.html" %}
+    <script src="{% static 'js/api/post_comment.js'%}"></script>
 </body>
 
 </html>

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
+from django.contrib.auth import login
 from .models import Comment, BlogPost, Category, Tag
 
 # User serializer, django provides a User model already, so we are going to use that model
@@ -25,19 +25,6 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return User.objects.create_user(validated_data['username'], 
         validated_data['email'], validated_data['password'])
-
-# Login Serializer
-class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField()
-
-    def validate(self, data):
-        # authenticate method explained here https://docs.djangoproject.com/en/3.0/topics/auth/default/#authenticating-users
-        user = authenticate(**data)
-        # if the given username and password matches a user, return that user
-        if user and user.is_active:
-            return user
-        raise serializers.ValidationError("Incorrect Credentials")
 
 # Comment Serializer
 class CommentSerializer(serializers.ModelSerializer):

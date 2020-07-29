@@ -39,6 +39,7 @@ class Comment(models.Model):
     body = models.TextField()
     post = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    username = models.CharField(max_length=30)
     created_date = models.DateTimeField(default=timezone.now)
 
 class Tag(models.Model):

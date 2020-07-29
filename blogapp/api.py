@@ -1,8 +1,26 @@
-from rest_framework import permissions, generics, viewsets, status, parsers
+from django.contrib.auth import login, logout
+
+from rest_framework import permissions, generics, viewsets, status, parsers, views
 from rest_framework.response import Response
+from knox.auth import TokenAuthentication
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, CommentSerializer, BlogPostSerializer, CategorySerializer, TagsSerializer
+from .serializers import UserSerializer, RegisterSerializer, CommentSerializer, BlogPostSerializer, CategorySerializer, TagsSerializer
 from .models import BlogPost, Comment, Category, Tag
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+import knox.views
+
+# User API
+class UserAPI(views.APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+    serializer_class = UserSerializer
+    # looks at the token sent, and returns the user using that token, notice this is a GET request
+
+    def get(self, request):
+        return self.request.user
+    
 
 # Register API
 class RegisterAPI(generics.GenericAPIView):
@@ -22,40 +40,32 @@ class RegisterAPI(generics.GenericAPIView):
             "token" : AuthToken.objects.create(user)[1]
         })
 
-# Login API
-class LoginAPI(generics.GenericAPIView):
-    serializer_class = LoginSerializer
-    # same logic as Register, but instead of using save() method, we use the validated_data 
-    # (which gets created when we call the validate method from the LoginSerializer, 
-    # which, gets called whenever we post stuff to this endpoint)
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data
-        return Response({
-            "user" : UserSerializer(user, context=self.get_serializer_context()).data,
-            "token" : AuthToken.objects.create(user)[1]
-        })
+class LogoutAPI(knox.views.LogoutView):
+    permission_classes = (permissions.IsAuthenticated,)
 
-# User API
-class UserAPI(generics.RetrieveAPIView):
-    permission_classes = [
-        permissions.IsAuthenticated
-    ]
-    serializer_class = UserSerializer
-    # looks at the token sent, and returns the user using that token, notice this is a GET request
-    def get_object(self):
-        return self.request.user
+    def post(self, request, format=None):
+        logout(request)
+        return super(LogoutAPI, self).post(request, format=None)
+
+class LoginAPI(knox.views.LoginView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        serializer = AuthTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        login(request, user)
+        return super(LoginAPI, self).post(request, format=None)
 
 # Comment API
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly
-    ]
+    permission_classes = (permissions.AllowAny,)
     serializer_class = CommentSerializer
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            request.data["username"] = request.user.username
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         comment = serializer.save()
@@ -71,9 +81,9 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     serializer_class = BlogPostSerializer
     parser_class = (parsers.FileUploadParser,)
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid():
             blogpost = serializer.save()
             return Response({
                 "post" : BlogPostSerializer(blogpost, context=self.get_serializer_context()).data
@@ -88,12 +98,12 @@ class CategoriesViewSet(viewsets.ModelViewSet):
     ]
     serializer_class = CategorySerializer
     
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid():
             category = serializer.save()
             return Response({
-                "post" : CategorySerializer(category, context=self.get_serializer_context()).data
+                "category" : CategorySerializer(category, context=self.get_serializer_context()).data
             }, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -104,12 +114,12 @@ class TagsViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly
     ]
     serializer_class = TagsSerializer 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid():
             tag = serializer.save()
             return Response({
-                "post" : TagsSerializer(tag, context=self.get_serializer_context()).data
+                "tag" : TagsSerializer(tag, context=self.get_serializer_context()).data
             }, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

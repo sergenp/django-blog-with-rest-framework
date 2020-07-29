@@ -3,7 +3,7 @@ const logout_link = document.querySelector('#logout-link');
 logout_link.addEventListener('click', event => {
     event.preventDefault();
     const token = localStorage.getItem("token");
-    axios.post('/api/auth/logout', {}, { headers: { Authorization: "Token" + " " + token}})
+    axios.post('/api/auth/logout', {}, { headers: {Authorization: "Token " + token}})
         .then(response => {
             localStorage.removeItem("token")
             window.location.replace("/")
