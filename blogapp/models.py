@@ -41,7 +41,15 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     username = models.CharField(max_length=30)
     created_date = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return self.title
+    
 
 class Tag(models.Model):
     title = models.CharField(max_length=50)
-    blog_posts = models.ForeignKey(BlogPost, on_delete=models.CASCADE, null=True)
+    posts = models.ManyToManyField(BlogPost)
+
+    def __str__(self):
+        return self.title
+    

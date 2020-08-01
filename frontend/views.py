@@ -17,11 +17,23 @@ def contact(request):
 def login(request):
     return render(request, 'login.html')
 
+def tag(request, id):
+    tag_obj = Tag.objects.filter(pk=id).first()
+    if tag_obj:
+        posts = tag_obj.posts.all().extra(select=
+  {'comment_count': 'SELECT count(*) FROM blogapp_comment WHERE blogapp_comment.post_id=blogapp_blogpost.id'},)
+        return render(request, 'tags.html', {"posts" : posts, "tag" : tag_obj})
+    else:
+        return render(request, '404.html')
+
 def post(request, id):
     post = BlogPost.objects.filter(pk=id).first()
-    comments = Comment.objects.filter(post=id)
-    tags = Tag.objects.all()
-    category = Category.objects.filter(pk=post.category.pk)
     if post:
-        return render(request, 'single.html',  {"post" : BlogPost.objects.get(pk=id), "tags" : tags, "category" : category, "comments" : comments})
+        comments = Comment.objects.filter(post=id)
+        tags = Tag.objects.filter(posts=id)
+        tag_cloud = Tag.objects.all()
+        category = Category.objects.filter(pk=post.category.pk)
+        return render(request, 'single.html',  {"post" : BlogPost.objects.get(pk=id), "tags" : tags, "tag_cloud":tag_cloud, 
+        "category" : category, "comments" : comments})
+   
     return render(request, '404.html')
