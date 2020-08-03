@@ -14,34 +14,7 @@
 		<div id="colorlib-main">
 			<section class="ftco-section ftco-no-pt ftco-no-pb bg-light">
 				<div class="container px-0">
-					<div class="row no-gutters">
-						{% for post in posts %}
-						<div class="col-md-4 d-flex">
-							<div class="blog-entry ftco-animate">	
-								<a href="/post/{{post.id}}" class="img"
-									style="background-image: url(/media/{{post.post_image}});"></a>
-								<div class="text p-4">
-									<h3 class="mb-2"><a href="/post/{{post.id}}">{{ post.title }}</a></h3>
-									<div class="meta-wrap">
-										<p class="meta">
-											<span><i class="icon-calendar mr-2"></i>{{ post.created_date }}</span>
-											<span><a href="#"><i
-														class="icon-folder-o mr-2"></i>{{ post.category.title }}</a></span>
-											{% if post.comment_count == 0 %}
-											<span><i class="icon-comment2"></i>No comments</span>
-											{% else %}
-											<span><i class="icon-comment2"></i>{{ post.comment_count }} Comment(s)</span>
-											{% endif %}
-										</p>
-									</div>
-									<p class="mb-4">{{post.formatted_markdown | safe |stringformat:".20s" }}</p>
-									<p><a href="/post/{{post.id}}" class="btn-custom">Read More <span
-												class="ion-ios-arrow-forward"></span></a></p>
-								</div>
-							</div>
-						</div>
-						{% endfor %}
-					</div>
+					{% include "_posts.html" %}
 				</div>
 			</section>
 		</div>

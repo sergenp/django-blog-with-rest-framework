@@ -23,8 +23,7 @@ def tag(request, id):
         posts = tag_obj.posts.all().extra(select=
   {'comment_count': 'SELECT count(*) FROM blogapp_comment WHERE blogapp_comment.post_id=blogapp_blogpost.id'},)
         return render(request, 'tags.html', {"posts" : posts, "tag" : tag_obj})
-    else:
-        return render(request, '404.html')
+    return render(request, '404.html')
 
 def post(request, id):
     post = BlogPost.objects.filter(pk=id).first()
@@ -35,5 +34,12 @@ def post(request, id):
         category = Category.objects.filter(pk=post.category.pk)
         return render(request, 'single.html',  {"post" : BlogPost.objects.get(pk=id), "tags" : tags, "tag_cloud":tag_cloud, 
         "category" : category, "comments" : comments})
-   
+    return render(request, '404.html')
+
+def category(request, id):
+    posts = BlogPost.objects.filter(category=id).extra(select=
+  {'comment_count': 'SELECT count(*) FROM blogapp_comment WHERE blogapp_comment.post_id=blogapp_blogpost.id'},)
+    category = Category.objects.filter(pk=id).first()
+    if category:
+        return render(request, 'categories.html',  {"posts" : posts, "category" : category})
     return render(request, '404.html')
